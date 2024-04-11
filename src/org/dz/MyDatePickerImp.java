@@ -1,7 +1,8 @@
 package org.dz;
 
-
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -9,65 +10,87 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JTextField;
-import org.balx.Resources;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 
 /**
  *
  * @author LuisR
  */
-public class MyDatePickerImp extends JComponent implements ActionListener, KeyListener, PropertyChangeListener {
+public class MyDatePickerImp extends JComponent implements ActionListener, CaretListener, KeyListener, PropertyChangeListener {
 
-    private final Date date;
+    private PropertyChangeSupport pcs;
+    public static final String DATE_CHANGED = "DATE_CHANGED";
+    public static final SimpleDateFormat formatDate = new SimpleDateFormat("dd-MM-yyyy");
 
+    /**
+     * Constructor por defecto
+     */
     public MyDatePickerImp() {
         this(new Date(), false);
     }
 
+    /**
+     * @param date
+     * @param show
+     */
     public MyDatePickerImp(Date date, boolean show) {
         this.date = date;
+        pcs = new PropertyChangeSupport(this);
         initComponent(show);
     }
 
     private void initComponent(boolean show) {
+
         btPick = new JButton();
         btPick.setActionCommand("SHOW_DATEPICKER");
         btPick.addActionListener(this);
-        btPick.setIcon(new ImageIcon(Resources.getImagen("icons/calendar_icon.png", MyDatePickerImp.class, 14, 14)));
+        btPick.setIcon(new ImageIcon(Resources.getImagen("gui/img/calendario.png", MyDatePickerImp.this.getClass(), 16, 16)));
         btPick.setPreferredSize(new Dimension(16, 16));
-        DatePicker = new DatePicker(Date);
-        DatePicker.addPropertyChangeListener(this);
-        DateField = new JTextField();
-        formatDate = new SimpleDateFormat("dd-MM-yyyy");
+        datePicker = new DatePicker(date);
+        datePicker.addPropertyChangeListener(this);
+        dateField = new JTextField();
+        dateField.addCaretListener(this);
+//        formatDate = new SimpleDateFormat("dd-MM-yyyy");
         if (show) {
-            DateField.setText(formatDate.format(Date));
+            dateField.setText(formatDate.format(date));
         }
         setLayout(new BoxLayout(this, 0));
-        add(DateField);
+        add(dateField);
         add(btPick);
-        
-        addKeyListener(this);
+        /*addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == 3) {
+                    DatePickerImp.this.setVisible(false);
+                }
+            }
+        });
+        addKeyListener(this);*/
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getActionCommand().equals("SHOW_DATEPICKER")) {
             dialog = new MyDialogEsc();
             dialog.setModalityType(java.awt.Dialog.ModalityType.APPLICATION_MODAL);
             dialog.setPreferredSize(new Dimension(200, 260));
-            dialog.add(DatePicker);
+            dialog.add(datePicker);
             dialog.setUndecorated(true);
             dialog.pack();
             Point loc = ((JComponent) e.getSource()).getLocationOnScreen();
@@ -77,49 +100,138 @@ public class MyDatePickerImp extends JComponent implements ActionListener, KeyLi
         }
     }
 
+    @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getPropertyName().startsWith("SEL_DIA_")) {
             Object value = evt.getNewValue();
             if (value != null && (value instanceof GregorianCalendar)) {
                 GregorianCalendar fecSel = (GregorianCalendar) value;
                 String stDate = formatDate.format(fecSel.getTime());
-                DateField.setText(stDate);
+                dateField.setText(stDate);
                 dialog.setVisible(false);
+                setDate(fecSel.getTime());
+                pcs.firePropertyChange(DATE_CHANGED, null, fecSel.getTime());
             }
         }
     }
 
+    public SimpleDateFormat getFormatDate() {
+        return formatDate;
+    }
+
     public String getText() {
-        return DateField.getText();
+        System.out.println(dateField.getText());
+        return dateField.getText();
     }
 
     public void setText(String text) {
-        DateField.setText(text);
+        dateField.setText(text);
+        try {
+            date = formatDate.parse(text);
+        } catch (ParseException ex) {
+            Logger.getLogger(MyDatePickerImp.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     public void setEditable(boolean editable) {
-        java.awt.Color background = DateField.getBackground();
-        DateField.setEditable(editable);
+        java.awt.Color background = dateField.getBackground();
+        dateField.setEditable(editable);
         btPick.setEnabled(editable);
-        DateField.setBackground(background);
+        dateField.setBackground(background);
     }
 
+    public void setTextEditable(boolean editable) {
+        java.awt.Color background = dateField.getBackground();
+        dateField.setEditable(editable);
+        dateField.setBackground(background);
+    }
+
+    public void setFontField(Font f) {
+        dateField.setFont(f);
+    }
+
+    public void setFieldForeground(Color color) {
+        dateField.setForeground(color);
+    }
+
+    @Override
     public void keyTyped(KeyEvent e) {
-//        throw new unsupportedoperationexception("Not supported yet.");
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public void keyPressed(KeyEvent e) {
-//        throw new unsupportedoperationexception("Not supported yet.");
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public void keyReleased(KeyEvent e) {
-//        throw new unsupportedoperationexception("Not supported yet.");
+        throw new UnsupportedOperationException("Not supported yet.");
     }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+        setText(formatDate.format(date));
+    }
+
+    @Override
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        if (listener != null) {
+//            super.addPropertyChangeListener(listener);
+            if (!containsListener(pcs, listener)) {
+                pcs.addPropertyChangeListener(listener);
+            }
+        }
+    }
+
+    @Override
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+        if (listener != null) {
+//            super.removePropertyChangeListener(listener);
+            pcs.removePropertyChangeListener(listener);
+        }
+    }
+
+    public void addCaretListener(CaretListener listener) {
+        dateField.addCaretListener(listener);
+    }
+
+    @Override
+    public void setEnabled(boolean enabled) {
+        super.setEnabled(enabled);
+        dateField.setEnabled(enabled);
+        btPick.setEnabled(enabled);
+    }
+
+    private boolean containsListener(PropertyChangeSupport pcs, PropertyChangeListener pcl) {
+        ArrayList<PropertyChangeListener> listeners = new ArrayList<>(Arrays.asList(pcs.getPropertyChangeListeners()));
+        return listeners.contains(pcl);
+    }
+
+    @Override
+    public void caretUpdate(CaretEvent e) {
+        if (e.getSource().equals(dateField)) {
+
+            try {
+                date = formatDate.parse(dateField.getText());
+            } catch (Exception ex) {
+                date = getDate();
+            }
+        }
+    }
+
+    public void showDate() {
+        dateField.setText(formatDate.format(date));
+    }
+
     private JButton btPick;
-    private DatePicker DatePicker;
-    private JTextField DateField;
-    private Date Date;
-    private SimpleDateFormat formatDate;
+    private DatePicker datePicker;
+    private JTextField dateField;
+    private Date date;
     private MyDialogEsc dialog;
 
 }

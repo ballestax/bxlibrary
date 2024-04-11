@@ -22,10 +22,10 @@ import java.util.Random;
  */
 public class StringUtil {
 
-    public static void randomString() {
-        Random r = new Random();
-        int n = r.nextInt(10);
-
+    public static String randomString(int length) {
+        byte[] array = new byte[length];
+        new Random().nextBytes(array);
+        return new String(array, Charset.forName("UTF-8"));
     }
 
     public static ArrayList<String> readFile(String path) throws UnsupportedEncodingException, FileNotFoundException, IOException {
@@ -65,7 +65,7 @@ public class StringUtil {
     }
     
     public static String getNumeroFormateado(int num, int pos) {
-        int l = org.dzur.Mat.getCifras(num).length;
+        int l = Mat.getCifras(num).length;
         if (l >= pos) {
             return String.valueOf(num);
         } else {
@@ -100,6 +100,12 @@ public class StringUtil {
             nuevoNombre = nuevoNombre.substring(0, nuevoNombre.length() - 1);
         }
         return nuevoNombre.split("@");
+    }
+    
+    public static String removerDobleEspacioBlanco(final String str) {
+        String ret;
+        for (ret = str; ret.contains("  "); ret = ret.replace("  ", " ")) {}
+        return ret;
     }
 
 }

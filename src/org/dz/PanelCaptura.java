@@ -24,7 +24,12 @@ public abstract class PanelCaptura extends JPanel implements Reseteable {
 
     public PanelCaptura() {
         bordeError = BorderFactory.createLineBorder(java.awt.Color.RED);
-        bordeNormal = UIManager.getBorder("TextField.border");
+        try {
+            bordeNormal = UIManager.getBorder("TextField.border");
+        } catch (Exception e) {
+            bordeNormal = BorderFactory.createLineBorder(java.awt.Color.darkGray);
+        }
+
         pcs = new PropertyChangeSupport(this);
     }
 
@@ -36,11 +41,19 @@ public abstract class PanelCaptura extends JPanel implements Reseteable {
         this.bordeError = bordeError;
     }
 
+    @Override
     public void addPropertyChangeListener(PropertyChangeListener pcl) {
+        if (pcs == null) {
+            pcs = new PropertyChangeSupport(this);
+        }
         pcs.addPropertyChangeListener(pcl);
     }
 
+    @Override
     public void removePropertyChangeListener(PropertyChangeListener pcl) {
+        if (pcs == null) {
+            pcs = new PropertyChangeSupport(this);
+        }
         pcs.removePropertyChangeListener(pcl);
     }
 

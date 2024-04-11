@@ -8,7 +8,7 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import org.dzur.ImagenesFx;
+
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -49,7 +49,7 @@ public class CalendarioDia extends Rectangulo implements Comparable {
         this.g = g.create();
         BufferedImage textoImagen = null;
         try {
-            textoImagen = ImagenesFx.textoImagen((new StringBuilder()).append(dia).append("").toString(), width, height, isMarcado() ? colorMarca : colorFuente, isSeleccionado() ? colorSeleccionado : colorFondo, new Font("Arial", 1, 16));
+            textoImagen = ImagenFx.textoImagen((new StringBuilder()).append(dia).append("").toString(), width, height, isMarcado() ? colorMarca : colorFuente, isSeleccionado() ? colorSeleccionado : colorFondo, new Font("Arial", 1, 16));
         } catch (Exception e) {
             System.err.println((new StringBuilder()).append("exc: ").append(e.getMessage()).toString());
         }

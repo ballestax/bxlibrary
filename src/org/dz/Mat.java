@@ -26,7 +26,22 @@ public class Mat {
         }
         return cifras;
     }
+    
+     public static int[] getCifras(long numero) {
+        int max = getNumeroCifras(numero);
+        int cifras[] = new int[max];
+        for (int i = 0; i < max; i++) {
+            double p1 = Math.pow(10D, i + 1);
+            double p2 = Math.pow(10D, i);
+            cifras[max - (i + 1)] = Math.abs((int) (((double) numero % p1) / p2));
+        }
+        return cifras;
+    }
 
+    public static int getNumeroCifras(long numero) {
+        return String.valueOf(Math.abs(numero)).length();
+    }
+    
     public static int getNumeroCifras(int numero) {
         return String.valueOf(Math.abs(numero)).length();
     }
@@ -192,6 +207,30 @@ public class Mat {
 
     public double getDoubleWhitPrecision(double valor, int precision) {
         return valor;
+    }
+    
+    public static int sumarArray(int[] dat) {
+        int suma = 0;
+        for (int i = 0; i < dat.length; i++) {
+            suma += dat[i];
+        }
+        return suma;
+    }
+
+    public static float sumarArray(float[] dat) {
+        float suma = 0f;
+        for (int i = 0; i < dat.length; i++) {
+            suma += dat[i];
+        }
+        return suma;
+    }
+
+    public static double sumarArray(double[] dat) {
+        double suma = 0.0;
+        for (int i = 0; i < dat.length; i++) {
+            suma += dat[i];
+        }
+        return suma;
     }
 
 }

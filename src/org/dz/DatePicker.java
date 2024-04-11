@@ -36,7 +36,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.border.Border;
-import org.balx.Resources;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -95,13 +94,18 @@ public class DatePicker extends JPanel implements KeyListener, MouseListener, Ac
         this(new Date());
     }
 
-    public DatePicker(Date fecha) {
+    public DatePicker(Date fecha) {        
         listo = false;
         pcs = new PropertyChangeSupport(this);
-        hoy = new GregorianCalendar();
+        try {
+            hoy = new GregorianCalendar();
+            sel = (GregorianCalendar) hoy.clone();
+            prev = (GregorianCalendar) hoy.clone();
+        } catch (Exception e) {
+        }
+
         hoy.setTime(fecha);
-        sel = (GregorianCalendar) hoy.clone();
-        prev = (GregorianCalendar) hoy.clone();
+
         formFecha = new SimpleDateFormat("EEEE, d MMMM YYYY");
         formMes = new SimpleDateFormat("MMMM");
         formAnio = new SimpleDateFormat("YYYY");

@@ -3,7 +3,6 @@ package org.dz;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Polygon;
 import java.io.BufferedReader;
@@ -22,10 +21,7 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
-import org.balx.Matriz;
-import org.balx.Punto;
+
 
 /*
  * To change this license header, choose License Headers in Project Properties.

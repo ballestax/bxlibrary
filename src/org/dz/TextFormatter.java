@@ -9,7 +9,6 @@ import java.awt.Toolkit;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
-import org.w3c.dom.Document;
 
 /**
  *
@@ -102,10 +101,10 @@ public class TextFormatter {
             }
         }
 
-        private double checkInput(String proposedValue) throws NumberFormatException {
-            double newValue = 0.0D;
+        private long checkInput(String proposedValue) throws NumberFormatException {
+            long newValue = 0L;
             if (proposedValue.length() > 0) {
-                newValue = Double.parseDouble(proposedValue);
+                newValue = Long.parseLong(proposedValue);
             }
             return newValue;
         }

@@ -1,6 +1,5 @@
 package org.dz;
 
-
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -9,6 +8,7 @@ import java.awt.GradientPaint;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.RenderingHints;
+import java.awt.font.LineMetrics;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
@@ -21,16 +21,12 @@ import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
-import org.balx.ColorDg;
-import org.balx.Utiles;
-import sun.font.FontLineMetrics;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 /**
  *
  * @author LuisR
@@ -38,6 +34,36 @@ import sun.font.FontLineMetrics;
 public final class Imagenes {
 
     public Imagenes() {
+    }
+    
+    public static BufferedImage toBuffereredImage(final Image imagen) {
+        BufferedImage bi = null;
+        try {
+            bi = new BufferedImage(imagen.getWidth(null), imagen.getHeight(null), 2);
+            final Graphics2D g = bi.createGraphics();
+            g.drawImage(imagen, 0, 0, null);
+        }
+        catch (Exception e) {
+            bi = new BufferedImage(100, 100, 2);
+            final Graphics2D g2 = bi.createGraphics();
+            g2.drawString("Error", 20, 45);
+        }
+        return bi;
+    }
+    
+    public static byte[] bufferedImageToArrayBytes(final BufferedImage image) {
+        try {
+            final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ImageIO.write(image, "jpg", baos);
+            baos.flush();
+            final byte[] imagenByte = baos.toByteArray();
+            baos.close();
+            return imagenByte;
+        }
+        catch (IOException ex) {
+            Logger.getLogger(Utiles.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
+        }
     }
 
     public static Image rotar(Image img, int w, int h, int angulo) {
@@ -48,23 +74,21 @@ public final class Imagenes {
         return imagen;
     }
 
-    public static Image pintarColorDG(int w, int h, ColorDg dg, int orientacion, int velocidad) {
+    public static Image pintarColorDG(int w, int h, Color color1, Color color2, int orientacion, int velocidad) {
         Image imagen = new BufferedImage(w, h, 2);
         Graphics2D g = (Graphics2D) imagen.getGraphics();
         int xP[] = {4, w - 5, w - 5, 4};
         int yP[] = {4, 4, h - 5, h - 5};
         int x2P[] = {7, w - 8, w - 8, 7};
         int y2P[] = {7, 7, h - 8, h - 8};
-        color1 = dg.getArrColor1();
-        color2 = dg.getArrColor2();
-        int vR = color1[0];
-        int vG = color1[1];
-        int vB = color1[2];
-        int vA = color1[3];
-        int dif1 = color1[0] - color2[0];
-        int dif2 = color1[1] - color2[1];
-        int dif3 = color1[2] - color2[2];
-        int dif4 = color1[3] - color2[3];
+        int vR = color1.getRed();
+        int vG = color1.getGreen();
+        int vB = color1.getBlue();
+        int vA = color1.getAlpha();
+        int dif1 = vR - color2.getRed();
+        int dif2 = vG - color2.getGreen();
+        int dif3 = vB - color2.getBlue();
+        int dif4 = vA - color2.getAlpha();
         int aux[] = {Math.abs(dif1), Math.abs(dif2), Math.abs(dif3), Math.abs(dif4)};
         if (Utiles.eliminaCeros(aux) != null) {
             aux = Utiles.eliminaCeros(aux);
@@ -103,7 +127,7 @@ public final class Imagenes {
         return imagen;
     }
 
-    public static Image pintarColorDG(int w, int h, ColorDg dg, int orientacion, int velocidad, String titulo) {
+    public static Image pintarColorDG(int w, int h,Color color1, Color color2, int orientacion, int velocidad, String titulo) {
         Image imagen = new BufferedImage(w, h, 2);
         Graphics2D g = (Graphics2D) imagen.getGraphics();
         int t = titulo.length();
@@ -118,16 +142,15 @@ public final class Imagenes {
         int yP[] = {4 + (tA + 3), 4 + (tA + 3), h - 4, h - 4};
         int x2P[] = {6, w - 7, w - 7, 6};
         int y2P[] = {6 + (tA + 3), 6 + (tA + 3), h - 7, h - 7};
-        color1 = dg.getArrColor1();
-        color2 = dg.getArrColor2();
-        int vR = color1[0];
-        int vG = color1[1];
-        int vB = color1[2];
-        int vA = color1[3];
-        int dif1 = color1[0] - color2[0];
-        int dif2 = color1[1] - color2[1];
-        int dif3 = color1[2] - color2[2];
-        int dif4 = color1[3] - color2[3];
+        
+        int vR = color1.getRed();
+        int vG = color1.getGreen();
+        int vB = color1.getBlue();
+        int vA = color1.getAlpha();
+        int dif1 = vR - color2.getRed();
+        int dif2 = vG - color2.getGreen();
+        int dif3 = vB - color2.getBlue();
+        int dif4 = vA - color2.getAlpha();
         int aux[] = {Math.abs(dif1), Math.abs(dif2), Math.abs(dif3), Math.abs(dif4)};
         if (Utiles.eliminaCeros(aux) != null) {
             aux = Utiles.eliminaCeros(aux);
@@ -210,7 +233,7 @@ public final class Imagenes {
         g.setColor(fondo);
         g.fillRect(0, 0, w, h);
         java.awt.font.FontRenderContext frc = g.getFontRenderContext();
-        FontLineMetrics lm = (FontLineMetrics) g.getFont().getLineMetrics(s, frc);
+        LineMetrics lm = g.getFont().getLineMetrics(s, frc);
         float height = lm.getHeight();
         float ds = lm.getDescent();
         float e = ((float) h - height * (float) n) / (float) (n + 1);
@@ -223,7 +246,7 @@ public final class Imagenes {
             f = new Font(f.getFontName(), f.getStyle(), f.getSize() - 1);
             g.setFont(f);
             frc = g.getFontRenderContext();
-            lm = (FontLineMetrics) g.getFont().getLineMetrics(s, frc);
+            lm =  g.getFont().getLineMetrics(s, frc);
             height = lm.getHeight();
             ds = lm.getDescent();
             e = ((float) h - height * (float) n) / (float) (n + 1);
@@ -292,7 +315,7 @@ public final class Imagenes {
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g.setFont(f);
         java.awt.font.FontRenderContext frc = g.getFontRenderContext();
-        FontLineMetrics lm = (FontLineMetrics) g.getFont().getLineMetrics(s, frc);
+        LineMetrics lm =  g.getFont().getLineMetrics(s, frc);
         g.setColor(fondo);
         g.fillRect(0, 0, w, h);
         linea = partirCadena(s, 50);
@@ -322,7 +345,7 @@ public final class Imagenes {
         String token = " ";
         do {
             if (calcularLargoTMinimo(s, f, w) < tamFuenteMin) {
-                System.out.println((new StringBuilder()).append(calcularLargoTMinimo(s, f, w)).append(" <-> ").append(tamFuenteMin).toString());
+//                System.out.println((new StringBuilder()).append(calcularLargoTMinimo(s, f, w)).append(" <-> ").append(tamFuenteMin).toString());
                 int ind = s.lastIndexOf(token);
                 linea[0] = s.substring(0, ind);
                 temp = linea[1];
@@ -364,7 +387,7 @@ public final class Imagenes {
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g.setFont(f);
         java.awt.font.FontRenderContext frc = g.getFontRenderContext();
-        FontLineMetrics lm = (FontLineMetrics) g.getFont().getLineMetrics(s, frc);
+        LineMetrics lm =  g.getFont().getLineMetrics(s, frc);
         float bot = lm.getLeading() + lm.getDescent();
         Rectangle2D bounds = g.getFont().getStringBounds(s, frc);
         return (new int[]{(int) bounds.getWidth(), (int) bounds.getHeight(), (int) bot});
@@ -376,7 +399,7 @@ public final class Imagenes {
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g.setFont(f);
         java.awt.font.FontRenderContext frc = g.getFontRenderContext();
-        FontLineMetrics lm = (FontLineMetrics) g.getFont().getLineMetrics("0", frc);
+        LineMetrics lm =  g.getFont().getLineMetrics("0", frc);
         Rectangle2D bounds = g.getFont().getStringBounds("0", frc);
         g.setColor(new Color(20, 0, 0, 50));
         g.fillRect(0, 0, w, h);
@@ -404,7 +427,7 @@ public final class Imagenes {
         return imagen;
     }
 
-    public static Image centrarTextoLim(int w, int h, String s, Font f, Color fondo, Color letra, int espacio, int maximo) {
+    public static Image centrarTextoLim(int w, int h, String s, Font f, Color fondo, Color letra, int espacio, int maximo, boolean shading) {
         Image imagen = new BufferedImage(w, h, 2);
         Graphics2D g = (Graphics2D) imagen.getGraphics();
         String linea[] = null;
@@ -420,15 +443,17 @@ public final class Imagenes {
         int my = h - alto;
         for (int i = 0; i < linea.length; i++) {
             linea[i] = Utiles.eliminarAcentos(linea[i]);
-            FontLineMetrics lm = (FontLineMetrics) g.getFont().getLineMetrics(linea[i], frc);
+            LineMetrics lm =  g.getFont().getLineMetrics(linea[i], frc);
             Rectangle2D bounds = g.getFont().getStringBounds(linea[i], frc);
             float largoCadena = (float) bounds.getWidth();
             float alturaCadena = (float) bounds.getHeight() - lm.getLeading();
             if (linea.length == 1) {
                 espacio *= -1;
             }
-            g.setColor(Color.black);
-            g.drawString(linea[i], (float) mx + ((float) (largo / 2) - largoCadena / 2.0F), (int) ((float) (my + espacio * (i + 1)) + alturaCadena * (float) (i + 1)));
+            if (shading) {
+                g.setColor(Color.black);
+                g.drawString(linea[i], (float) mx + ((float) (largo / 2) - largoCadena / 2.0F), (int) ((float) (my + espacio * (i + 1)) + alturaCadena * (float) (i + 1)));
+            }
             g.setColor(letra);
             g.drawString(linea[i], (float) mx + ((float) (largo / 2) - largoCadena / 2.0F) + 1.0F, (int) ((float) (my + espacio * (i + 1)) + alturaCadena * (float) (i + 1)) + 1);
         }
@@ -520,20 +545,6 @@ public final class Imagenes {
         return cols;
     }
     
-    public static byte[] bufferedImageToArrayBytes(BufferedImage image) {
-        try {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ImageIO.write(image, "jpg", baos);
-            baos.flush();
-            byte[] imagenByte = baos.toByteArray();
-            baos.close();
-            return imagenByte;
-        } catch (IOException ex) {
-            Logger.getLogger(Utiles.class.getName()).log(Level.SEVERE, null, ex);
-            return null;
-        }
-    }
-    
     public static boolean saveImage(BufferedImage image, String format, File file) {
         boolean write = false;
         try {
@@ -543,7 +554,7 @@ public final class Imagenes {
         }
         return write;
     }
-    
+
     public static final int X_ALIG = 1;
     public static final int Y_ALIG = 2;
     private static int color1[];
